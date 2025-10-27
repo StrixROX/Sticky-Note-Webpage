@@ -10,10 +10,11 @@ WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
-SHADOW_BLUR_RADIUS = 20
-SHADOW_OFFSET_X = 0
-SHADOW_OFFSET_Y = 4
-SHADOW_COLOR = (0, 0, 0, 100)  # RGBA
+# Shadow configuration: matches CSS "box-shadow: 0 0 10px rgba(0,0,0,0.3)"
+SHADOW_BLUR_RADIUS = 10  # 10px blur
+SHADOW_OFFSET_X = 0       # 0px horizontal offset
+SHADOW_OFFSET_Y = 0       # 0px vertical offset
+SHADOW_COLOR = (0, 0, 0, 76)  # rgba(0,0,0,0.3) = 0.3 * 255 ≈ 76
 
 
 class StickyPagesWindow(QMainWindow):
