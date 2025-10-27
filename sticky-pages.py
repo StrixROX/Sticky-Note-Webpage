@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QGraphicsDropShadowEffect
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import (QKeyEvent, QCloseEvent, QPainterPath, QBitmap, 
-                         QPainter, QBrush, QRegion)
+                         QPainter, QBrush, QRegion, QColor)
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -10,6 +10,10 @@ WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
+SHADOW_BLUR_RADIUS = 20
+SHADOW_OFFSET_X = 0
+SHADOW_OFFSET_Y = 4
+SHADOW_COLOR = (0, 0, 0, 100)  # RGBA
 
 
 class StickyPagesWindow(QMainWindow):
@@ -18,19 +22,30 @@ class StickyPagesWindow(QMainWindow):
         self.initUI()
     
     def initUI(self):
-        # Set window size
-        self.setFixedSize(WIDTH, HEIGHT)
+        # Set window size (add padding for shadow)
+        shadow_padding = SHADOW_BLUR_RADIUS * 2
+        self.setFixedSize(WIDTH + shadow_padding, HEIGHT + shadow_padding)
         
         # Apply frameless window with rounded corners
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
         
-        # Create central widget
+        # Calculate shadow padding for positioning
+        shadow_padding = SHADOW_BLUR_RADIUS * 2
+        
+        # Create central widget with shadow
         self.central_widget = QWidget(self)
         self.central_widget.setStyleSheet('''
                                      background-color: white;
                                      ''')
-        self.setCentralWidget(self.central_widget)
+        self.central_widget.setGeometry(shadow_padding // 2, shadow_padding // 2, WIDTH, HEIGHT)
+        
+        # Apply shadow effect
+        self.shadow = QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(SHADOW_BLUR_RADIUS)
+        self.shadow.setOffset(SHADOW_OFFSET_X, SHADOW_OFFSET_Y)
+        self.shadow.setColor(QColor(*SHADOW_COLOR))
+        self.central_widget.setGraphicsEffect(self.shadow)
         
         # Create and configure web view
         self.web_view = QWebEngineView(self.central_widget)
@@ -54,7 +69,7 @@ class StickyPagesWindow(QMainWindow):
             CORNER_RADIUS, CORNER_RADIUS
         )
         
-        # Create a bitmap mask
+        # Create a bitmap mask for the central widget
         mask = QBitmap(WIDTH, HEIGHT)
         mask.fill(Qt.color0)  # Transparent
         
@@ -67,8 +82,25 @@ class StickyPagesWindow(QMainWindow):
         # Apply mask to the central widget to clip background and web content
         self.central_widget.setMask(mask)
         self.web_view.setMask(mask)
-        # Also set window mask for the overall shape
-        self.setMask(mask)
+        
+        # Create window mask to include shadow
+        shadow_padding = SHADOW_BLUR_RADIUS * 2
+        window_mask = QBitmap(WIDTH + shadow_padding, HEIGHT + shadow_padding)
+        window_mask.fill(Qt.color0)
+        
+        painter2 = QPainter(window_mask)
+        painter2.setRenderHint(QPainter.Antialiasing)
+        painter2.setBrush(QBrush(Qt.color1))
+        window_path = QPainterPath()
+        window_path.addRoundedRect(
+            shadow_padding // 2, shadow_padding // 2,
+            WIDTH, HEIGHT,
+            CORNER_RADIUS, CORNER_RADIUS
+        )
+        painter2.drawPath(window_path)
+        painter2.end()
+        
+        self.setMask(window_mask)
     
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
