@@ -9,6 +9,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
+CORNER_RADIUS = 10
 
 
 class StickyPagesWindow(QMainWindow):
@@ -46,12 +47,11 @@ class StickyPagesWindow(QMainWindow):
     
     def apply_rounded_mask(self):
         """Apply rounded corners mask to the window"""
-        radius = 10
         path = QPainterPath()
         path.addRoundedRect(
             0, 0, 
             WIDTH, HEIGHT, 
-            radius, radius
+            CORNER_RADIUS, CORNER_RADIUS
         )
         
         # Create a bitmap mask
