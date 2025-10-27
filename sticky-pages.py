@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import (QKeyEvent, QCloseEvent, QPainterPath, QBitmap, 
-                         QPainter, QBrush, QRegion, QColor)
+                         QPainter, QBrush, QRegion)
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -10,11 +10,8 @@ WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
-# Shadow configuration: matches CSS "box-shadow: 0 0 10px rgba(0,0,0,0.3)"
-SHADOW_BLUR_RADIUS = 10  # 10px blur
-SHADOW_OFFSET_X = 0       # 0px horizontal offset
-SHADOW_OFFSET_Y = 0       # 0px vertical offset
-SHADOW_COLOR = (0, 0, 0, 76)  # rgba(0,0,0,0.3) = 0.3 * 255 ≈ 76
+BORDER_WIDTH = 2  # Border width in pixels
+BORDER_COLOR = "rgba(255, 255, 255, 0.3)"  # Translucent white
 
 
 class StickyPagesWindow(QMainWindow):
@@ -23,30 +20,21 @@ class StickyPagesWindow(QMainWindow):
         self.initUI()
     
     def initUI(self):
-        # Set window size (add padding for shadow)
-        shadow_padding = SHADOW_BLUR_RADIUS * 2
-        self.setFixedSize(WIDTH + shadow_padding, HEIGHT + shadow_padding)
+        # Set window size
+        self.setFixedSize(WIDTH, HEIGHT)
         
         # Apply frameless window with rounded corners
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
         
-        # Calculate shadow padding for positioning
-        shadow_padding = SHADOW_BLUR_RADIUS * 2
-        
-        # Create central widget with shadow
+        # Create central widget with border
         self.central_widget = QWidget(self)
-        self.central_widget.setStyleSheet('''
+        self.central_widget.setStyleSheet(f'''
                                      background-color: white;
+                                     border: {BORDER_WIDTH}px solid {BORDER_COLOR};
+                                     border-radius: {CORNER_RADIUS}px;
                                      ''')
-        self.central_widget.setGeometry(shadow_padding // 2, shadow_padding // 2, WIDTH, HEIGHT)
-        
-        # Apply shadow effect
-        self.shadow = QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(SHADOW_BLUR_RADIUS)
-        self.shadow.setOffset(SHADOW_OFFSET_X, SHADOW_OFFSET_Y)
-        self.shadow.setColor(QColor(*SHADOW_COLOR))
-        self.central_widget.setGraphicsEffect(self.shadow)
+        self.setCentralWidget(self.central_widget)
         
         # Create and configure web view
         self.web_view = QWebEngineView(self.central_widget)
@@ -70,7 +58,7 @@ class StickyPagesWindow(QMainWindow):
             CORNER_RADIUS, CORNER_RADIUS
         )
         
-        # Create a bitmap mask for the central widget
+        # Create a bitmap mask
         mask = QBitmap(WIDTH, HEIGHT)
         mask.fill(Qt.color0)  # Transparent
         
@@ -80,28 +68,10 @@ class StickyPagesWindow(QMainWindow):
         painter.drawPath(path)
         painter.end()
         
-        # Apply mask to the central widget to clip background and web content
+        # Apply mask to clip content with rounded corners
         self.central_widget.setMask(mask)
         self.web_view.setMask(mask)
-        
-        # Create window mask to include shadow
-        shadow_padding = SHADOW_BLUR_RADIUS * 2
-        window_mask = QBitmap(WIDTH + shadow_padding, HEIGHT + shadow_padding)
-        window_mask.fill(Qt.color0)
-        
-        painter2 = QPainter(window_mask)
-        painter2.setRenderHint(QPainter.Antialiasing)
-        painter2.setBrush(QBrush(Qt.color1))
-        window_path = QPainterPath()
-        window_path.addRoundedRect(
-            shadow_padding // 2, shadow_padding // 2,
-            WIDTH, HEIGHT,
-            CORNER_RADIUS, CORNER_RADIUS
-        )
-        painter2.drawPath(window_path)
-        painter2.end()
-        
-        self.setMask(window_mask)
+        self.setMask(mask)
     
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
