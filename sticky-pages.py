@@ -10,8 +10,8 @@ WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
-BORDER_WIDTH = 5  # Border width in pixels
-BORDER_COLOR = "rgba(255, 255, 255, 0.3)"  # Translucent white
+BORDER_WIDTH = 8  # Border width in pixels
+BORDER_COLOR = "rgba(255, 255, 255, 0.7)"  # Translucent white with higher opacity
 
 
 class StickyPagesWindow(QMainWindow):
