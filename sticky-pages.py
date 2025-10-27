@@ -3,7 +3,7 @@ import os
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl, QTimer
-from PyQt5.QtGui import QKeyEvent, QCloseEvent, QPainterPath, QBitmap, QPainter, QBrush
+from PyQt5.QtGui import QKeyEvent, QCloseEvent, QPainterPath, QPainter, QColor, QRegion
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Default configuration
@@ -67,70 +67,60 @@ class StickyPagesWindow(QMainWindow):
         # Apply frameless window with rounded corners
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setFixedSize(WIDTH, HEIGHT)
 
         # Create central widget with border
         self.central_widget = QWidget(self)
-        self.central_widget.setStyleSheet(
-            f"""
-                                     background-color: white;
-                                     border: {BORDER_WIDTH}px solid {BORDER_COLOR};
-                                     border-radius: {CORNER_RADIUS}px;
-                                     """
-        )
+        self.central_widget.setAttribute(Qt.WA_TranslucentBackground)
         self.setCentralWidget(self.central_widget)
 
-        # Create and configure web view with padding for border
+        # Web view (smaller than total area so border space is visible)
         self.web_view = QWebEngineView(self.central_widget)
-        self.web_view.setUrl(QUrl(WEBPAGE_URL))
-        # Position web view with padding to show the border
         padding = BORDER_WIDTH
         self.web_view.setGeometry(
-            padding, padding, WIDTH - (padding * 2), HEIGHT - (padding * 2)
+            padding, padding, WIDTH - padding * 2, HEIGHT - padding * 2
         )
+        self.web_view.setUrl(QUrl(WEBPAGE_URL))
 
-        # Enable JavaScript for proper website functionality
-        settings = self.web_view.settings()
-        settings.setAttribute(settings.WebAttribute.JavascriptEnabled, True)
-        settings.setAttribute(settings.WebAttribute.PluginsEnabled, True)
-
-        # Apply rounded mask to create actual rounded corners
-        self.apply_rounded_mask()
+        # Slight delay to ensure proper window mask
+        QTimer.singleShot(0, self.apply_rounded_mask)
 
     def apply_rounded_mask(self):
-        """Apply rounded corners mask to the window"""
-        # Window mask includes border
+        """Apply rounded-corner mask to the window."""
         path = QPainterPath()
         path.addRoundedRect(0, 0, WIDTH, HEIGHT, CORNER_RADIUS, CORNER_RADIUS)
+        region = QRegion(path.toFillPolygon().toPolygon())
+        self.setMask(region)
 
-        window_mask = QBitmap(WIDTH, HEIGHT)
-        window_mask.fill(Qt.color0)  # Transparent
-
-        painter = QPainter(window_mask)
+    def paintEvent(self, event):
+        """Draw translucent rounded border on top of the web view."""
+        painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QBrush(Qt.color1))  # Opaque
-        painter.drawPath(path)
+
+        def parse_rgba(s):
+            if s.startswith("rgba"):
+                vals = [x.strip() for x in s[5:-1].split(",")]
+                r, g, b, a = map(float, vals)
+                return QColor(int(r), int(g), int(b), int(a * 255))
+            return QColor(s)
+
+        color = parse_rgba(BORDER_COLOR)
+        painter.setPen(QColor(color))
+        painter.setPen(color)
+        painter.setBrush(Qt.NoBrush)
+        pen = painter.pen()
+        pen.setWidth(BORDER_WIDTH)
+        painter.setPen(pen)
+
+        rect = self.rect().adjusted(
+            BORDER_WIDTH // 2,
+            BORDER_WIDTH // 2,
+            -BORDER_WIDTH // 2,
+            -BORDER_WIDTH // 2,
+        )
+
+        painter.drawRoundedRect(rect, CORNER_RADIUS, CORNER_RADIUS)
         painter.end()
-
-        self.setMask(window_mask)
-
-        # Web view mask (inner rounded corners)
-        padding = BORDER_WIDTH
-        inner_w = WIDTH - (padding * 2)
-        inner_h = HEIGHT - (padding * 2)
-
-        path2 = QPainterPath()
-        path2.addRoundedRect(0, 0, inner_w, inner_h, CORNER_RADIUS, CORNER_RADIUS)
-
-        web_mask = QBitmap(inner_w, inner_h)
-        web_mask.fill(Qt.color0)
-
-        painter2 = QPainter(web_mask)
-        painter2.setRenderHint(QPainter.Antialiasing)
-        painter2.setBrush(QBrush(Qt.color1))
-        painter2.drawPath(path2)
-        painter2.end()
-
-        self.web_view.setMask(web_mask)
 
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
