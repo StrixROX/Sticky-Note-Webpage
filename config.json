@@ -1,0 +1,10 @@
+{
+  "width": 800,
+  "height": 600,
+  "xPos": 50,
+  "yPos": 50,
+  "webpageUrl": "https://www.google.com",
+  "cornerRadius": 10,
+  "borderWidth": 8,
+  "borderColor": "rgba(255, 255, 255, 0.5)"
+}

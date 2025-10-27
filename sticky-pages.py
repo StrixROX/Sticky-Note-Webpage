@@ -1,18 +1,58 @@
+import json
+import os
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import QKeyEvent, QCloseEvent, QPainterPath, QBitmap, QPainter, QBrush
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
-# Configuration
-WIDTH = 800
-HEIGHT = 600
-X_POS = 50  # X coordinate (top left origin), None for center
-Y_POS = 50  # Y coordinate (top left origin), None for center
-WEBPAGE_URL = "https://www.google.com"
-CORNER_RADIUS = 10
-BORDER_WIDTH = 8  # Border width in pixels
-BORDER_COLOR = "rgba(255, 255, 255, 0.7)"  # Translucent white with higher opacity
+# Default configuration
+DEFAULT_CONFIG = {
+    "width": 800,
+    "height": 600,
+    "xPos": 50,
+    "yPos": 50,
+    "webpageUrl": "https://www.google.com",
+    "cornerRadius": 10,
+    "borderWidth": 8,
+    "borderColor": "rgba(255, 255, 255, 0.7)",
+}
+
+# Declare globals (initialized with defaults)
+WIDTH = DEFAULT_CONFIG["width"]
+HEIGHT = DEFAULT_CONFIG["height"]
+X_POS = DEFAULT_CONFIG["xPos"]
+Y_POS = DEFAULT_CONFIG["yPos"]
+WEBPAGE_URL = DEFAULT_CONFIG["webpageUrl"]
+CORNER_RADIUS = DEFAULT_CONFIG["cornerRadius"]
+BORDER_WIDTH = DEFAULT_CONFIG["borderWidth"]
+BORDER_COLOR = DEFAULT_CONFIG["borderColor"]
+
+
+def load_config(path="config.json"):
+    """Load configuration from a JSON file with camelCase keys and update global vars."""
+    global WIDTH, HEIGHT, X_POS, Y_POS, WEBPAGE_URL, CORNER_RADIUS, BORDER_WIDTH, BORDER_COLOR
+
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            print(f"Warning: Invalid JSON in {path}. Using defaults.")
+            data = {}
+    else:
+        print(f"Warning: {path} not found. Using defaults.")
+        data = {}
+
+    # Apply loaded or default values
+    WIDTH = data.get("width", DEFAULT_CONFIG["width"])
+    HEIGHT = data.get("height", DEFAULT_CONFIG["height"])
+    X_POS = data.get("xPos", DEFAULT_CONFIG["xPos"])
+    Y_POS = data.get("yPos", DEFAULT_CONFIG["yPos"])
+    WEBPAGE_URL = data.get("webpageUrl", DEFAULT_CONFIG["webpageUrl"])
+    CORNER_RADIUS = data.get("cornerRadius", DEFAULT_CONFIG["cornerRadius"])
+    BORDER_WIDTH = data.get("borderWidth", DEFAULT_CONFIG["borderWidth"])
+    BORDER_COLOR = data.get("borderColor", DEFAULT_CONFIG["borderColor"])
 
 
 class StickyPagesWindow(QMainWindow):
@@ -135,4 +175,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_config(path="config.json")
     main()
