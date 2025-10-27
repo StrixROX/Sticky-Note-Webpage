@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -41,10 +42,18 @@ class StickyPagesWindow(QMainWindow):
         self.web_view.setUrl(QUrl(WEBPAGE_URL))
         self.web_view.setGeometry(0, 0, WIDTH, HEIGHT)
         
-        # Make web view readonly (disable interaction)
+        # Enable JavaScript for proper website functionality
         settings = self.web_view.settings()
-        settings.setAttribute(settings.WebAttribute.JavascriptEnabled, False)
-        settings.setAttribute(settings.WebAttribute.PluginsEnabled, False)
+        settings.setAttribute(settings.WebAttribute.JavascriptEnabled, True)
+        settings.setAttribute(settings.WebAttribute.PluginsEnabled, True)
+    
+    def keyPressEvent(self, event: QKeyEvent):
+        """Handle keyboard shortcuts"""
+        # Alt+F4 to close the window
+        if event.key() == Qt.Key_F4 and event.modifiers() == Qt.AltModifier:
+            self.close()
+        else:
+            super().keyPressEvent(event)
 
 
 def main():
