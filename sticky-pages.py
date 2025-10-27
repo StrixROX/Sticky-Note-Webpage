@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import (QKeyEvent, QCloseEvent, QPainterPath, QBitmap, 
-                         QPainter, QBrush)
+                         QPainter, QBrush, QRegion)
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -23,18 +23,11 @@ class StickyPagesWindow(QMainWindow):
         # Apply frameless window with rounded corners
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setStyleSheet('''
-                           QMainWindow {
-                               background-color: transparent;
-                               border-radius: 10px;
-                           }
-                           ''')
         
         # Create central widget
         self.central_widget = QWidget(self)
         self.central_widget.setStyleSheet('''
                                      background-color: white;
-                                     border-radius: 10px;
                                      ''')
         self.setCentralWidget(self.central_widget)
         
@@ -48,11 +41,11 @@ class StickyPagesWindow(QMainWindow):
         settings.setAttribute(settings.WebAttribute.JavascriptEnabled, True)
         settings.setAttribute(settings.WebAttribute.PluginsEnabled, True)
         
-        # Apply rounded mask to central widget
+        # Apply rounded mask to create actual rounded corners
         self.apply_rounded_mask()
     
     def apply_rounded_mask(self):
-        """Apply rounded corners mask to the central widget"""
+        """Apply rounded corners mask to the window"""
         radius = 10
         path = QPainterPath()
         path.addRoundedRect(
@@ -71,7 +64,11 @@ class StickyPagesWindow(QMainWindow):
         painter.drawPath(path)
         painter.end()
         
+        # Apply mask to the central widget to clip background and web content
         self.central_widget.setMask(mask)
+        self.web_view.setMask(mask)
+        # Also set window mask for the overall shape
+        self.setMask(mask)
     
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
@@ -80,6 +77,12 @@ class StickyPagesWindow(QMainWindow):
             self.close()
         else:
             super().keyPressEvent(event)
+    
+    def showEvent(self, event):
+        """When shown, ensure mask is properly applied"""
+        super().showEvent(event)
+        # Reapply mask after widgets are laid out
+        QTimer.singleShot(0, self.apply_rounded_mask)
     
     def closeEvent(self, event: QCloseEvent):
         """Handle window close event"""
