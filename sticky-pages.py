@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QCloseEvent
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -54,6 +54,11 @@ class StickyPagesWindow(QMainWindow):
             self.close()
         else:
             super().keyPressEvent(event)
+    
+    def closeEvent(self, event: QCloseEvent):
+        """Handle window close event"""
+        QApplication.instance().quit()
+        event.accept()
 
 
 def main():
