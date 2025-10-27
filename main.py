@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import sys
@@ -43,6 +44,24 @@ def load_config(path="config.json"):
     else:
         print(f"Warning: {path} not found. Using defaults.")
         data = {}
+
+    # CLI args can override config.json values
+    cli_arg_parser = argparse.ArgumentParser(
+        prog="StickyPages",
+        description="Stick webpages to your desktop like post-it notes.",
+    )
+    cli_arg_parser.add_argument(
+        "-u",
+        "--url",
+        type=str,
+        default="",
+        help="specify URL of the webpage rendered",
+    )
+
+    webpage_url_from_cli = cli_arg_parser.parse_args().url
+
+    if webpage_url_from_cli != "":
+        data["webpageUrl"] = webpage_url_from_cli
 
     # Apply loaded or default values
     WIDTH = data.get("width", DEFAULT_CONFIG["width"])

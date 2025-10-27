@@ -34,6 +34,8 @@ python main.py
 
 The window will open at the specified position or center itself if `xPos`/`yPos` are `null`.
 
+> **Update**: You can pass the argument ```[-u URL]``` to override the webpage URL from the command line, for usage with scripts etc. Run ```python main.py -h``` for help.
+
 ## ⚙️ Configuration
 
 You can control the appearance and behavior of the window via `config.json`.
