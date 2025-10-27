@@ -36,10 +36,12 @@ class StickyPagesWindow(QMainWindow):
                                      ''')
         self.setCentralWidget(self.central_widget)
         
-        # Create and configure web view
+        # Create and configure web view with padding for border
         self.web_view = QWebEngineView(self.central_widget)
         self.web_view.setUrl(QUrl(WEBPAGE_URL))
-        self.web_view.setGeometry(0, 0, WIDTH, HEIGHT)
+        # Position web view with padding to show the border
+        padding = BORDER_WIDTH
+        self.web_view.setGeometry(padding, padding, WIDTH - (padding * 2), HEIGHT - (padding * 2))
         
         # Enable JavaScript for proper website functionality
         settings = self.web_view.settings()
@@ -51,6 +53,7 @@ class StickyPagesWindow(QMainWindow):
     
     def apply_rounded_mask(self):
         """Apply rounded corners mask to the window"""
+        # Window mask includes border
         path = QPainterPath()
         path.addRoundedRect(
             0, 0, 
@@ -58,20 +61,39 @@ class StickyPagesWindow(QMainWindow):
             CORNER_RADIUS, CORNER_RADIUS
         )
         
-        # Create a bitmap mask
-        mask = QBitmap(WIDTH, HEIGHT)
-        mask.fill(Qt.color0)  # Transparent
+        window_mask = QBitmap(WIDTH, HEIGHT)
+        window_mask.fill(Qt.color0)  # Transparent
         
-        painter = QPainter(mask)
+        painter = QPainter(window_mask)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setBrush(QBrush(Qt.color1))  # Opaque
         painter.drawPath(path)
         painter.end()
         
-        # Apply mask to clip content with rounded corners
-        self.central_widget.setMask(mask)
-        self.web_view.setMask(mask)
-        self.setMask(mask)
+        self.setMask(window_mask)
+        
+        # Web view mask (inner rounded corners)
+        padding = BORDER_WIDTH
+        inner_w = WIDTH - (padding * 2)
+        inner_h = HEIGHT - (padding * 2)
+        
+        path2 = QPainterPath()
+        path2.addRoundedRect(
+            0, 0,
+            inner_w, inner_h,
+            CORNER_RADIUS, CORNER_RADIUS
+        )
+        
+        web_mask = QBitmap(inner_w, inner_h)
+        web_mask.fill(Qt.color0)
+        
+        painter2 = QPainter(web_mask)
+        painter2.setRenderHint(QPainter.Antialiasing)
+        painter2.setBrush(QBrush(Qt.color1))
+        painter2.drawPath(path2)
+        painter2.end()
+        
+        self.web_view.setMask(web_mask)
     
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
