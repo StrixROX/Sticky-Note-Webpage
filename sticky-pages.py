@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QKeyEvent, QCloseEvent
+from PyQt5.QtGui import (QKeyEvent, QCloseEvent, QPainterPath, QBitmap, 
+                         QPainter, QBrush)
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration
@@ -30,15 +31,15 @@ class StickyPagesWindow(QMainWindow):
                            ''')
         
         # Create central widget
-        central_widget = QWidget(self)
-        central_widget.setStyleSheet('''
+        self.central_widget = QWidget(self)
+        self.central_widget.setStyleSheet('''
                                      background-color: white;
                                      border-radius: 10px;
                                      ''')
-        self.setCentralWidget(central_widget)
+        self.setCentralWidget(self.central_widget)
         
         # Create and configure web view
-        self.web_view = QWebEngineView(central_widget)
+        self.web_view = QWebEngineView(self.central_widget)
         self.web_view.setUrl(QUrl(WEBPAGE_URL))
         self.web_view.setGeometry(0, 0, WIDTH, HEIGHT)
         
@@ -46,6 +47,31 @@ class StickyPagesWindow(QMainWindow):
         settings = self.web_view.settings()
         settings.setAttribute(settings.WebAttribute.JavascriptEnabled, True)
         settings.setAttribute(settings.WebAttribute.PluginsEnabled, True)
+        
+        # Apply rounded mask to central widget
+        self.apply_rounded_mask()
+    
+    def apply_rounded_mask(self):
+        """Apply rounded corners mask to the central widget"""
+        radius = 10
+        path = QPainterPath()
+        path.addRoundedRect(
+            0, 0, 
+            WIDTH, HEIGHT, 
+            radius, radius
+        )
+        
+        # Create a bitmap mask
+        mask = QBitmap(WIDTH, HEIGHT)
+        mask.fill(Qt.color0)  # Transparent
+        
+        painter = QPainter(mask)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QBrush(Qt.color1))  # Opaque
+        painter.drawPath(path)
+        painter.end()
+        
+        self.central_widget.setMask(mask)
     
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
