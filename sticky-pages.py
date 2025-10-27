@@ -10,7 +10,7 @@ WIDTH = 800
 HEIGHT = 600
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
-BORDER_WIDTH = 2  # Border width in pixels
+BORDER_WIDTH = 5  # Border width in pixels
 BORDER_COLOR = "rgba(255, 255, 255, 0.3)"  # Translucent white
 
 
