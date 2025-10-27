@@ -8,6 +8,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 # Configuration
 WIDTH = 800
 HEIGHT = 600
+X_POS = 100  # X coordinate (top left origin)
+Y_POS = 100  # Y coordinate (top left origin)
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
 BORDER_WIDTH = 8  # Border width in pixels
@@ -118,7 +120,15 @@ class StickyPagesWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     
+    # Get screen geometry for centering
+    screen = app.primaryScreen().geometry()
+    
+    # Calculate center position
+    center_x = (screen.width() - WIDTH) // 2
+    center_y = (screen.height() - HEIGHT) // 2
+    
     window = StickyPagesWindow()
+    window.move(center_x, center_y)  # Center window on screen
     window.show()
     
     sys.exit(app.exec_())
