@@ -8,8 +8,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 # Configuration
 WIDTH = 800
 HEIGHT = 600
-X_POS = None  # X coordinate (top left origin), None for center
-Y_POS = None  # Y coordinate (top left origin), None for center
+X_POS = 50  # X coordinate (top left origin), None for center
+Y_POS = 50  # Y coordinate (top left origin), None for center
 WEBPAGE_URL = "https://www.google.com"
 CORNER_RADIUS = 10
 BORDER_WIDTH = 8  # Border width in pixels
