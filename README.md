@@ -2,7 +2,7 @@
 
 > _A small PyQt experiment so that I could pin my Notion pages to my desktop like post-it notes._
 
-**StickyPages** is a minimal frameless desktop browser window built with **PyQt5** and **QtWebEngine**.  
+**StickyPages** is a minimal frameless desktop browser window built with **PyQt6** and **QtWebEngine**.  
 It lets you “stick” any webpage onto your desktop in a stylish, rounded, translucent frame.
 
 ## ✨ Features
@@ -77,7 +77,7 @@ StickyPages/
 
 ## 🧠 Notes
 
-* The app uses **PyQt5** and **QtWebEngine** for rendering web content.
+* The app uses **PyQt6** and **QtWebEngine** for rendering web content.
 * The window is **non-resizable** and **frameless**.
 * Border and corner radius are applied using Qt’s painter masks.
 * Press **Alt + F4** to close the window cleanly.

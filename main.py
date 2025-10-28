@@ -2,10 +2,18 @@ import argparse
 import json
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
-from PyQt5.QtCore import Qt, QUrl, QTimer
-from PyQt5.QtGui import QKeyEvent, QCloseEvent, QPainterPath, QPainter, QColor, QRegion
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt6.QtCore import Qt, QUrl, QTimer, QRect
+from PyQt6.QtGui import (
+    QKeyEvent,
+    QCloseEvent,
+    QPainterPath,
+    QPainter,
+    QColor,
+    QRegion,
+    QPen,
+)
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 # Default configuration
 DEFAULT_CONFIG = {
@@ -84,20 +92,19 @@ class StickyPagesWindow(QMainWindow):
         self.setFixedSize(WIDTH, HEIGHT)
 
         # Apply frameless window with rounded corners
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setFixedSize(WIDTH, HEIGHT)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Create central widget with border
         self.central_widget = QWidget(self)
-        self.central_widget.setAttribute(Qt.WA_TranslucentBackground)
+        self.central_widget.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setCentralWidget(self.central_widget)
 
         # Web view (smaller than total area so border space is visible)
         self.web_view = QWebEngineView(self.central_widget)
         padding = BORDER_WIDTH
         self.web_view.setGeometry(
-            padding, padding, WIDTH - padding * 2, HEIGHT - padding * 2
+            QRect(padding, padding, WIDTH - padding * 2, HEIGHT - padding * 2)
         )
         self.web_view.setUrl(QUrl(WEBPAGE_URL))
 
@@ -114,7 +121,7 @@ class StickyPagesWindow(QMainWindow):
     def paintEvent(self, event):
         """Draw translucent rounded border on top of the web view."""
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         def parse_rgba(s):
             if s.startswith("rgba"):
@@ -124,12 +131,10 @@ class StickyPagesWindow(QMainWindow):
             return QColor(s)
 
         color = parse_rgba(BORDER_COLOR)
-        painter.setPen(QColor(color))
-        painter.setPen(color)
-        painter.setBrush(Qt.NoBrush)
-        pen = painter.pen()
+        pen = QPen(color)
         pen.setWidth(BORDER_WIDTH)
         painter.setPen(pen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
 
         rect = self.rect().adjusted(
             BORDER_WIDTH // 2,
@@ -144,7 +149,10 @@ class StickyPagesWindow(QMainWindow):
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts"""
         # Alt+F4 to close the window
-        if event.key() == Qt.Key_F4 and event.modifiers() == Qt.AltModifier:
+        if (
+            event.key() == Qt.Key.Key_F4
+            and event.modifiers() == Qt.KeyboardModifier.AltModifier
+        ):
             self.close()
         else:
             super().keyPressEvent(event)
@@ -180,7 +188,7 @@ def main():
     window.move(pos_x, pos_y)
     window.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
