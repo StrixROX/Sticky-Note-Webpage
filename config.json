@@ -1,11 +1,11 @@
 {
-  "width": 800,
+  "width": 1500,
   "height": 600,
-  "xPos": 50,
-  "yPos": 50,
+  "xPos": null,
+  "yPos": 400,
   "webpageUrl": "https://www.google.com",
   "cornerRadius": 10,
   "borderWidth": 8,
   "borderColor": "rgba(255, 255, 255, 0.1)",
-  "windowOpacity": 0.95
+  "windowOpacity": 0.90
 }

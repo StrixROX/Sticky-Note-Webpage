@@ -179,14 +179,12 @@ def main():
     # Get screen geometry
     screen = app.primaryScreen().geometry()
 
-    # Determine window position
-    if X_POS is not None and Y_POS is not None:
-        # Use specified coordinates
-        pos_x, pos_y = X_POS, Y_POS
-    else:
-        # Center window on screen
-        pos_x = (screen.width() - WIDTH) // 2
-        pos_y = (screen.height() - HEIGHT) // 2
+    # Determine window position (allow independent nulls)
+    screen_width = screen.width()
+    screen_height = screen.height()
+
+    pos_x = X_POS if X_POS is not None else (screen_width - WIDTH) // 2
+    pos_y = Y_POS if Y_POS is not None else (screen_height - HEIGHT) // 2
 
     window = StickyPagesWindow()
     window.move(pos_x, pos_y)
