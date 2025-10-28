@@ -52,7 +52,8 @@ Example:
   "webpageUrl": "https://www.google.com",
   "cornerRadius": 10,
   "borderWidth": 8,
-  "borderColor": "rgba(255, 255, 255, 0.7)"
+  "borderColor": "rgba(255, 255, 255, 0.7)",
+  "windowOpacity": 1.0
 }
 ```
 
@@ -64,6 +65,7 @@ Example:
 | `cornerRadius`    | number        | Corner roundness in pixels                                  |
 | `borderWidth`     | number        | Border thickness in pixels                                  |
 | `borderColor`     | string        | RGBA color for border (supports transparency)               |
+| `windowOpacity`   | number        | Opacity of the window between 0.0 and 1.0 (default)         |
 
 ## 🧩 Project Structure
 
