@@ -24,7 +24,8 @@ DEFAULT_CONFIG = {
     "webpageUrl": "https://www.google.com",
     "cornerRadius": 10,
     "borderWidth": 8,
-    "borderColor": "rgba(255, 255, 255, 0.7)",
+    "borderColor": "rgba(255, 255, 255, 0.5)",
+    "windowOpacity": 1.0,
 }
 
 # Declare globals (initialized with defaults)
@@ -36,11 +37,12 @@ WEBPAGE_URL = DEFAULT_CONFIG["webpageUrl"]
 CORNER_RADIUS = DEFAULT_CONFIG["cornerRadius"]
 BORDER_WIDTH = DEFAULT_CONFIG["borderWidth"]
 BORDER_COLOR = DEFAULT_CONFIG["borderColor"]
+WINDOW_OPACITY = DEFAULT_CONFIG["windowOpacity"]
 
 
 def load_config(path="config.json"):
     """Load configuration from a JSON file with camelCase keys and update global vars."""
-    global WIDTH, HEIGHT, X_POS, Y_POS, WEBPAGE_URL, CORNER_RADIUS, BORDER_WIDTH, BORDER_COLOR
+    global WIDTH, HEIGHT, X_POS, Y_POS, WEBPAGE_URL, CORNER_RADIUS, BORDER_WIDTH, BORDER_COLOR, WINDOW_OPACITY
 
     if os.path.exists(path):
         try:
@@ -80,6 +82,7 @@ def load_config(path="config.json"):
     CORNER_RADIUS = data.get("cornerRadius", DEFAULT_CONFIG["cornerRadius"])
     BORDER_WIDTH = data.get("borderWidth", DEFAULT_CONFIG["borderWidth"])
     BORDER_COLOR = data.get("borderColor", DEFAULT_CONFIG["borderColor"])
+    WINDOW_OPACITY = data.get("windowOpacity", DEFAULT_CONFIG["windowOpacity"])
 
 
 class StickyPagesWindow(QMainWindow):
@@ -94,6 +97,7 @@ class StickyPagesWindow(QMainWindow):
         # Apply frameless window with rounded corners
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowOpacity(WINDOW_OPACITY)
 
         # Create central widget with border
         self.central_widget = QWidget(self)
