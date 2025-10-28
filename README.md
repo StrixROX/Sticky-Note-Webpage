@@ -5,6 +5,13 @@
 **StickyPages** is a minimal frameless desktop browser window built with **PyQt6** and **QtWebEngine**.  
 It lets you “stick” any webpage onto your desktop in a stylish, rounded, translucent frame.
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c101d730-a93d-4dfc-aa71-156665f1bc8b" />
+
+
+https://github.com/user-attachments/assets/efcb82ef-97c2-4cff-9844-cefe85787d63
+
+
+
 ## ✨ Features
 
 - 🌐 Displays any webpage (customizable via `config.json`)
